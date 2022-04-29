@@ -1084,8 +1084,20 @@ const EditorPanel = (props) => {
 		));
 	};
 
+	const Error = () => {
+		return (
+			<section className="waiting">
+				<section className="waiting-container">
+					<h3>Error With Configuration</h3>
+					<p>{state.runtime.editorErrorMessage}</p>
+				</section>
+			</section>
+		);
+	}
+
 	return (
 		<ErrorBoundary component='EditorPanel'>
+			{ state?.runtime?.editorErrorMessage.length > 0 && <Error />}
 			{requiredColumns && (
 				<Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
 			)}

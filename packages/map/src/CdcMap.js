@@ -119,6 +119,26 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
         }
     });
 
+    useEffect(() => {
+        if (runtimeLegend.length === 0) {
+            setState({
+                ...state,
+                runtime: {
+                    ...state.runtime,
+                    editorErrorMessage: 'Error with legend. Try adjusting the legend type'
+                }
+            })
+        } else {
+            setState({
+                ...state,
+                runtime: {
+                    ...state.runtime,
+                    editorErrorMessage: []
+                }
+            })
+        }
+    }, [runtimeLegend]);
+
     // Tag each row with a UID. Helps with filtering/placing geos. Not enumerable so doesn't show up in loops/console logs except when directly addressed ex row.uid
     // We are mutating state in place here (depending on where called) - but it's okay, this isn't used for rerender
     const addUIDs = useCallback((obj, fromColumn) => {
