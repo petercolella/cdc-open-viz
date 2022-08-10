@@ -181,6 +181,11 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
 
     const getColumnSum = (arr:(string|number)[]) => {
+
+      if(config.dataFormat.ignoreZeros) {
+        arr = arr.filter( item => item && item)
+      }
+      
       // first validation
       if(arr===undefined || arr===null){
         console.error('Enter valid value for getColumnSum function ')
@@ -207,6 +212,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         console.error('Enter valid parameter getColumnMean function')
         return 
       }
+
+      if(config.dataFormat.ignoreZeros) {
+        arr = arr.filter( item => item && item)
+      }
      
       let mean:number = 0
       if(arr.length > 1){
@@ -222,6 +231,10 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     // this function accepts any array and returns array of strings
       let freq = {}
       let max = -Infinity
+
+      if(config.dataFormat.ignoreZeros) {
+        arr = arr.filter( item => item && item)
+      }
 
       for(let i = 0; i < arr.length; i++) {
         if (freq[arr[i]]) {
@@ -245,6 +258,11 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
     }
 
     const getMedian = arr => {
+
+      if(config.dataFormat.ignoreZeros) {
+        arr = arr.filter( item => item && item)
+      }
+
       if(!arr.length) return ;
       const mid = Math.floor(arr.length / 2),
         nums = [...arr].sort((a, b) => a - b);
@@ -321,12 +339,15 @@ const { configUrl, config: configObj, isDashboard = false, isEditor = false, set
         dataBite = Math.max(...numericalData);
         break;
       case DATA_FUNCTION_MIN:
+        numericalData = (config.dataFormat.ignoreZeros) ? numericalData.filter( item => item && item ) : numericalData
         dataBite =Math.min(...numericalData);
         break;
       case DATA_FUNCTION_MODE:
+        numericalData = (config.dataFormat.ignoreZeros) ? numericalData.filter( item => item && item ) : numericalData
         dataBite = getMode(numericalData).join('');
         break;
       case DATA_FUNCTION_RANGE:
+        numericalData = (config.dataFormat.ignoreZeros) ? numericalData.filter( item => item && item ) : numericalData
         let rangeMin :number|string = Math.min(...numericalData)
         let rangeMax :number|string = Math.max(...numericalData)
           rangeMin =  applyPrecision(rangeMin)
