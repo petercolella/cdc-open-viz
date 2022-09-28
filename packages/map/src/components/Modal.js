@@ -19,7 +19,7 @@ const Modal = (props) => {
 
   return (
     <section className={capitalize ? 'modal-content tooltip capitalize ' + viewport : 'modal-content tooltip ' + viewport} aria-hidden="true">
-      <img src={closeIcon} className="modal-close" alt="Close Modal" />
+      <img src={closeIcon} className="modal-close" alt="Close Modal" tabIndex={0} role="button"/>
       {type === 'data' && <LegendCircle fill={legendColors[0]} />}
       <div className="content">
         {tooltip}

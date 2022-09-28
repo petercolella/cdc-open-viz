@@ -1450,6 +1450,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
     // Map container classes
     let mapContainerClasses = [
         'map-container',
+        'outline-none',
         state.legend.position,
         state.general.type,
         state.general.geoType
@@ -1579,7 +1580,7 @@ const CdcMap = ({className, config, navigationHandler: customNavigationHandler, 
                     <a id='skip-geo-container' className='cdcdataviz-sr-only-focusable' href={tabId}>
                         Skip Over Map Container
                     </a>
-					<section className='geography-container' ref={mapSvg} tabIndex="0">
+					<section className='geography-container' ref={mapSvg}>
                         {currentViewport && (
                             <section className='geography-container' ref={mapSvg}>
                                 {modal && (
