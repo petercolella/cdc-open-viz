@@ -50,8 +50,12 @@ export default function LineChart({ xScale, yScale, getXAxisData, getYAxisData, 
                     r={circleRadii}
                     cx={xScale(getXAxisData(d))}
                     cy={yScale(getYAxisData(d, seriesKey))}
-                    fill={colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}
-                    style={{fill: colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : '#000'}}
+                    fill={colorScale && !config.legend.dynamicLegend ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[seriesKey] : seriesKey) : 
+                      // is dynamic legend
+                      config.legend.dynamicLegend ? colorPalettes[config.palette][index] :
+                      // fallback
+                      '#000'
+                    }
                     data-tip={tooltip}
                     data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                   />

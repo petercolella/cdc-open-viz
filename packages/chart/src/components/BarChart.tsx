@@ -119,7 +119,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
 
               let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
-              let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
+              let displayBar = config.legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !config.legend.dynamicLegend) || seriesHighlight.indexOf(bar.key) !== -1;
               let barThickness = xMax / barStack.bars.length;
               let barThicknessAdjusted = barThickness * (config.barThickness || 0.8);
               let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
@@ -192,10 +192,12 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${xAxisTooltip}<br />
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
-                    let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
+                    let displayBar = config.legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !config.legend.dynamicLegend) || seriesHighlight.indexOf(bar.key) !== -1;
                     const barsPerGroup = config.series.length;
                     let barHeight = config.barHeight ? config.barHeight : 25;
                     let barPadding = barHeight;
+
+                    console.log('display bar', displayBar)
 
                     config.barHeight = Number(config.barHeight)
                     const style = applyRadius(barStack.index);
@@ -328,7 +330,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                   {barGroup.bars.map((bar,index) => {
 
                     let transparentBar = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(bar.key) === -1;
-                    let displayBar = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(bar.key) !== -1;
+                    let displayBar = config.legend.behavior === 'highlight' || (seriesHighlight.length === 0 && !config.legend.dynamicLegend) || seriesHighlight.indexOf(bar.key) !== -1;
                     let barHeight = orientation === "horizontal" ? config.barHeight : Math.abs(yScale(bar.value) - yScale(0));
                     let barY = bar.value >= 0 ? bar.y : yScale(0);
                     let barGroupWidth = (config.runtime.horizontal ? yMax : xMax) / barGroups.length * (config.barThickness || 0.8);
@@ -609,6 +611,18 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
             }) : ''}
           </Group>
         )}
+        {/* Message when dynamic legend and nothing has been picked */}
+        { (config.legend.dynamicLegend && seriesHighlight.length === 0) &&
+          <Text
+              x={ xMax / 2 }
+              y={yMax / 2}
+              fill="black"
+              textAnchor="middle"
+              color='black'
+              >
+              {config.legend.dynamicLegendChartMessage}
+          </Text>
+        }
       </Group>
     </ErrorBoundary>
   );
