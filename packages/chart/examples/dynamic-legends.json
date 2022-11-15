@@ -95,7 +95,7 @@
 			"Colorado": "300"
 		}
 	],
-	"visualizationType": "Line",
+	"visualizationType": "Bar",
 	"series": [
 		{
 			"dataKey": "Alabama",

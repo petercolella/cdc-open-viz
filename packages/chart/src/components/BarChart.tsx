@@ -1,17 +1,12 @@
 import React, { useContext, useState, useEffect } from 'react';
-
 import { Group } from '@visx/group';
 import { BarGroup, BarStack } from '@visx/shape';
 import { Text } from '@visx/text';
 import chroma from 'chroma-js';
-
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary';
-
 import Context from '../context';
 import ReactTooltip from 'react-tooltip';
 import { BarStackHorizontal } from '@visx/shape';
-
-
 
 export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getXAxisData, getYAxisData, animatedChart, visible }) {
   const { transformedData: data, colorScale, seriesHighlight, config, formatNumber, updateConfig, setParentConfig, colorPalettes, formatDate, parseDate } = useContext<any>(Context);
@@ -35,24 +30,24 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
   const stackCount = config.runtime.seriesKeys.length;
   const barBorderWidth = 1;
   
-  const applyRadius = (index:number)=>{
-    if(index === undefined || index === null || !isRounded) return;
+  const applyRadius = ( index:number ) => {
+    if( index === undefined || index === null || !isRounded ) return;
     let style = {};
 
-    if((isStacked && index+1 === stackCount) || !isStacked){
+    if( ( isStacked && index+1 === stackCount ) || !isStacked ) {
       style = isHorizontal ? {borderRadius:`0 ${radius}  ${radius}  0`} : {borderRadius:`${radius} ${radius} 0 0`};
     };
-    if(tipRounding === 'full' && isStacked && index === 0 && stackCount > 1){
+    if( tipRounding === 'full' && isStacked && index === 0 && stackCount > 1 ) {
       style = isHorizontal ? {borderRadius:`${radius} 0 0 ${radius}`} : {borderRadius:`0 0 ${radius} ${radius}`};
    };
-    if(tipRounding === 'full' && ((isStacked && index === 0 && stackCount === 1) || !isStacked)){
+    if( tipRounding === 'full' && ( ( isStacked && index === 0 && stackCount === 1 ) || !isStacked ) ) {
       style = {borderRadius:radius};
    };
 
    return style;
  }
 
-  // Using State
+  // TODO: rename/see if theres a better option for horizBarHeight
   const [horizBarHeight, setHorizBarHeight] = useState(null);
   const [textWidth, setTextWidth] = useState(null);
 
@@ -92,8 +87,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
     }
   },[config.barStyle])
 
-  // config.runtime.seriesKeys.sort().reverse();
-
   return (
     <ErrorBoundary component="BarChart">
       <Group left={config.runtime.yAxis.size}>
@@ -125,12 +118,14 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
               let offset = barThickness * (1 - (config.barThickness || 0.8)) / 2;
               const style = applyRadius(barStack.index)
 
+
+              // TODO: move styles out
               return (
                   <>
                     <style>
                       {`
                          #barStack${barStack.index}-${bar.index} rect,
-                         #barStack${barStack.index}-${bar.index} foreignObject{
+                         #barStack${barStack.index}-${bar.index} foreignObject {
                           animation-delay: ${barStack.index}.2s;
                           transform-origin: ${barThicknessAdjusted/2}px ${bar.y + bar.height}px
                         }
@@ -152,12 +147,16 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                 y={bar.y}
                 width={barThicknessAdjusted}
                 height={bar.height}
-                style={{background:bar.color,border:`${config.barHasBorder==='true' ? barBorderWidth: 0 }px solid #333`,...style}}
+                style={{
+                  background: config.legend.dynamicLegend ? bar.color : bar.color,
+                  border:`${ config.barHasBorder==='true' ? barBorderWidth: 0 }px solid #333`,
+                  ...style
+                }}
                 opacity={transparentBar ? 0.5 : 1}
                 display={displayBar ? 'block' : 'none'}
                 data-tip={tooltip}
                 data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-              >  </foreignObject>
+              />
               </Group>
                   </>
             )}
@@ -184,8 +183,6 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     const xAxisValue =  config.runtime.yAxis.type==='date'  ? formatDate(parseDate(data[bar.index][config.runtime.originalXAxis.dataKey])) : data[bar.index][config.runtime.originalXAxis.dataKey]
                     let yAxisTooltip = config.yAxis.label ? `${config.yAxis.label}: ${formatNumber(data[bar.index][bar.key])}` : `${bar.key}: ${formatNumber(data[bar.index][bar.key])}`
                     let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${xAxisValue}` : xAxisValue
-                    // let yAxisTooltip = config.yAxis.label ? `${config.yAxis.label}: ${data[bar.index][bar.key]}` : `${bar.key}: ${data[bar.index][bar.key]}`
-                    // let xAxisTooltip = config.xAxis.label ? `${config.xAxis.label}: ${data[bar.index][config.runtime.originalXAxis.dataKey]}` :`${data[bar.index].name}`
 
                     const tooltip = `<div>
                     ${yAxisTooltip}<br />
@@ -234,12 +231,16 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           y={ bar.y - config.barPadding/2 - config.barHeight/2 }
                           width={bar.width}
                           height={config.barHeight}
-                          style={{background:bar.color,border:`${config.barHasBorder==='true' ? barBorderWidth: 0 }px solid #333`,...style}}
+                          style={{
+                            background: config.legend.dynamicLegend ? bar.color : bar.color,
+                            border:`${config.barHasBorder==='true' ? barBorderWidth: 0 }px solid #333`,
+                            ...style
+                          }}
                           opacity={transparentBar ? 0.5 : 1}
                           display={displayBar ? 'block' : 'none'}
                           data-tip={tooltip}
                           data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                        ></foreignObject>
+                        />
 
                       {(orientation === 'horizontal' && visualizationSubType === 'stacked') && isLabelBelowBar && barStack.index === 0 && !config.yAxis.hideLabel &&
                           <Text
@@ -381,6 +382,19 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                     ${config.seriesLabel ? `${config.seriesLabel}: ${bar.key}` : ''}`
                     const style = applyRadius(index)
 
+                    const resolveBarColor = (config) => {
+                      // two tone lollipop bar color
+                      if(config.isLollipopChart && config.lollipopColorStyle === 'two-tone') {
+                        return chroma(barColor).brighten(1) ;
+                      }
+
+                      if(config.legend.dynamicLegend) {
+                        return colorPalettes[config.palette][index]
+                      }
+
+                      return barColor;
+                    }
+
                     return (
                         <>
                           {/* This feels gross but inline transition was not working well*/}
@@ -410,8 +424,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         width={config.runtime.horizontal ?  bar.y : barWidth}
                         height={config.runtime.horizontal ? barWidth : barHeight}
                         style={{
-                          background:config.isLollipopChart && config.lollipopColorStyle === 'regular' ? barColor :
-                            config.isLollipopChart && config.lollipopColorStyle === 'two-tone' ? chroma(barColor).brighten(1) : barColor ,
+                          background: resolveBarColor(config) ,
                           border:`${config.isLollipopChart ? 0 :config.barHasBorder==='true' ? barBorderWidth: 0 }px solid #333`,
                           ...style
                         }}
@@ -419,7 +432,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                         display={displayBar ? 'block' : 'none'}
                         data-tip={tooltip}
                         data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                      ></foreignObject>
+                      />
                       {config.isLollipopChart && config.lollipopShape === 'circle' &&
                         <circle
                           cx={orientation === 'horizontal' ? bar.y : barWidth * (barGroup.bars.length - bar.index - 1) + (isLabelBelowBar && orientation === 'horizontal' ? 0 : offset) + lollipopShapeSize/3.5}
@@ -429,7 +442,7 @@ export default function BarChart({ xScale, yScale, seriesScale, xMax, yMax, getX
                           key={`circle--${bar.index}`}
                           data-tip={tooltip}
                           data-for={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
-                          style={{ filter: 'unset' }}
+                          style={{ filter: 'unset', opacity: '1' }}
                         />
                       }
                       {config.isLollipopChart && config.lollipopShape === 'square' &&
