@@ -70,19 +70,34 @@
     }
 
     li {
-      padding: 0.3em 0.5em;
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 0.9em;
+      flex-wrap: wrap;
+
+      [role='button'] {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        width: 100%;
+        cursor: pointer;
+      }
 
       &:hover {
         background-color: $lightestGray;
       }
 
+      .series-list__details {
+        display: block;
+        width: 100%;
+        background: #f7f7f7;
+        padding: 15px;
+      }
       .series-list__name {
         position: relative;
         user-select: none;
+        padding: 0.3em 0.5em;
 
         &.series-list__name--truncate {
           &[data-title] {

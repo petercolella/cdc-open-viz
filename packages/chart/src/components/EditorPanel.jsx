@@ -431,6 +431,46 @@ const EditorPanel = () => {
     }
   }
 
+  const toggleDetails = (e, incomingSeries) => {
+    console.log(incomingSeries)
+    e.preventDefault()
+    let series = [...config.series]
+    let seriesIndex = -1
+    let detailsPanelExpanded
+
+    for (let i = 0; i < series.length; i++) {
+      if (series[i].dataKey === incomingSeries.dataKey) {
+        seriesIndex = i
+        break
+      }
+    }
+
+    // if series has detailsPanelExpanded toggle it
+    // if not set it to true
+    if (incomingSeries.hasOwnProperty('detailsPanelExpanded')) {
+      detailsPanelExpanded = !incomingSeries.detailsPanelExpanded
+    } else {
+      detailsPanelExpanded = true
+    }
+
+    series[seriesIndex] = {
+      ...series[seriesIndex],
+      detailsPanelExpanded
+    }
+    if (seriesIndex !== -1) {
+
+      let newConfig = {
+        ...config,
+        series
+      }
+
+      console.log('NEW CONFIG', newConfig)
+      updateConfig(newConfig)
+    }
+
+
+  }
+
   const addNewExclusion = exclusionKey => {
     let newExclusion = [...config.exclusions.keys]
     newExclusion.push(exclusionKey)
@@ -697,6 +737,8 @@ const EditorPanel = () => {
     validateMaxValue()
   }, [minValue, maxValue, config]) // eslint-disable-line
 
+  const typesWithRightSeriesAllowed = ["Line", "dashed-md", "dashed-sm", "dashed-lg"];
+
   return (
     <ErrorBoundary component='EditorPanel'>
       {config.newViz && <Confirm />}
@@ -864,6 +906,27 @@ const EditorPanel = () => {
                                       </select>
                                     )
 
+                                    let changeAxis = (i, value) => {
+                                      let series = [...config.series]
+                                      series[i].axis = value
+                                      updateConfig({ ...config, series })
+                                    }
+
+                                    let axisDropdown = (
+                                      <select
+                                        value={series.axis}
+                                        onChange={event => {
+                                          changeAxis(i, event.target.value)
+                                        }}
+                                        style={{ width: '100px', marginRight: '10px' }}
+                                      >
+                                        <option value='Left' default>
+                                          left
+                                        </option>
+                                        <option value='Right'>right</option>
+                                      </select>
+                                    )
+
                                     return (
                                       <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
                                         {(provided, snapshot) => (
@@ -873,14 +936,42 @@ const EditorPanel = () => {
                                                 <div className='series-list__name-text'>{series.dataKey}</div>
                                               </div>
                                               <span>
-                                                <span className='series-list__dropdown'>{typeDropdown}</span>
                                                 {config.series && config.series.length > 1 && (
-                                                  <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
-                                                    &#215;
-                                                  </button>
+                                                  <>
+                                                    <button className='series-list__remove' onClick={() => removeSeries(series.dataKey)}>
+                                                      &#215;
+                                                    </button>
+                                                    <Icon display={series.detailsPanelExpanded ? 'caretUp' : 'caretDown'} style={{ marginLeft: '0.5rem' }} onClick={(e) => toggleDetails(e, series)} />
+
+                                                  </>
                                                 )}
                                               </span>
                                             </div>
+
+
+                                            {series.detailsPanelExpanded &&
+                                              <div className="series-list__details">
+
+                                                {/* TYPE */}
+                                                <label>Series Type:</label>
+                                                <span className='series-list__dropdown'>{typeDropdown}</span>
+
+                                                {/* POSITION WILL BE NEXT */}
+                                                {typesWithRightSeriesAllowed.includes(series.type) ?
+                                                  <>
+                                                    <label>Axis Position:</label>
+                                                    <span className='series-list__dropdown series-list__dropdown--axis'>{axisDropdown}</span>
+                                                  </>
+                                                  :
+                                                  <>
+                                                    <label>Axis Position:</label>
+                                                    <p>Only line series data can be assigned to the right axis. Check the data series section above.</p>
+                                                  </>
+                                                }
+
+
+                                              </div>
+                                            }
                                           </li>
                                         )}
                                       </Draggable>
@@ -1117,70 +1208,6 @@ const EditorPanel = () => {
                         </Tooltip>
                       }
                     />
-                  </AccordionItemPanel>
-                </AccordionItem>
-              )}
-
-              {hasRightAxis && config.series && config.visualizationType === 'Combo' && (
-                <AccordionItem>
-                  <AccordionItemHeading>
-                    <AccordionItemButton>Assign Data Series Axis</AccordionItemButton>
-                  </AccordionItemHeading>
-                  <AccordionItemPanel>
-                    <p>Only line series data can be assigned to the right axis. Check the data series section above.</p>
-                    {config.series && config.series.filter(series => checkIsLine(series.type)) && (
-                      <>
-                        <fieldset>
-                          <legend className='edit-label float-left'>Displaying</legend>
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Assign an axis for the series</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </fieldset>
-                        <ul className='series-list'>
-                          {config.series &&
-                            config.series.map((series, i) => {
-                              if (series.type === 'Bar') return false // can't set individual bars atm.
-
-                              let changeAxis = (i, value) => {
-                                let series = [...config.series]
-                                series[i].axis = value
-                                updateConfig({ ...config, series })
-                              }
-
-                              let axisDropdown = (
-                                <select
-                                  value={series.axis}
-                                  onChange={event => {
-                                    changeAxis(i, event.target.value)
-                                  }}
-                                  style={{ width: '100px', marginRight: '10px' }}
-                                >
-                                  <option value='Left' default>
-                                    left
-                                  </option>
-                                  <option value='Right'>right</option>
-                                </select>
-                              )
-
-                              return (
-                                <li key={series.dataKey}>
-                                  <div className={`series-list__name${series.dataKey.length > 15 ? ' series-list__name--truncate' : ''}`} data-title={series.dataKey}>
-                                    <div className='series-list__name-text'>{series.dataKey}</div>
-                                  </div>
-                                  <span>
-                                    <span className='series-list__dropdown'>{axisDropdown}</span>
-                                  </span>
-                                </li>
-                              )
-                            })}
-                        </ul>
-                      </>
-                    )}
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
