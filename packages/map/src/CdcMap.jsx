@@ -9,6 +9,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 import ReactTooltip from 'react-tooltip'
 import chroma from 'chroma-js'
 import parse from 'html-react-parser'
+import { v4 as uuid } from 'uuid';
 
 // Data
 import colorPalettes from '../../core/data/colorPalettes'
@@ -98,6 +99,9 @@ const getUniqueValues = (data, columnName) => {
   return Object.keys(result)
 }
 
+const unique_id = uuid();
+const small_id = unique_id.slice(0, 8)
+  
 const CdcMap = ({ className, config, navigationHandler: customNavigationHandler, isDashboard = false, isEditor = false, configUrl, logo = null, setConfig, setSharedFilter, setSharedFilterValue, hostname = 'localhost:8080', link }) => {
   const transform = new DataTransform()
   const [state, setState] = useState({ ...initialState })
@@ -1063,6 +1067,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
 
     // If modals are set or we are on a mobile viewport, display modal
     if (window.matchMedia('(any-hover: none)').matches || 'click' === state.tooltips.appearanceType) {
+      console.log("MAP setModal geoName, value",key,value)
       setModal({
         geoName: key,
         keyedData: value
@@ -1402,7 +1407,6 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         {isEditor && <EditorPanel isDashboard={isDashboard} state={state} setState={setState} loadConfig={loadConfig} setParentConfig={setConfig} setRuntimeFilters={setRuntimeFilters} runtimeFilters={runtimeFilters} runtimeLegend={runtimeLegend} columnsInData={Object.keys(state.data[0])} />}
         {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
           <section className={`cdc-map-inner-container ${currentViewport}`} aria-label={'Map: ' + title} ref={innerContainerRef}>
-            {!window.matchMedia('(any-hover: none)').matches && 'hover' === tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
             {state.general.title && (
               <header className={general.showTitle === true ? 'visible' : 'hidden'} {...(!general.showTitle || !state.general.title ? { 'aria-hidden': true } : { 'aria-hidden': false })}>
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
@@ -1445,6 +1449,8 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                     {'data' === general.type && logo && <img src={logo} alt='' className='map-logo' />}
                   </section>
                 )}
+                {!window.matchMedia('(any-hover: none)').matches && 'hover' === state.tooltips.appearanceType && <ReactTooltip id='tooltip' place='right' type='light' html={true} className={tooltips.capitalizeLabels ? 'capitalize tooltip' : 'tooltip'} />}
+ 
               </section>
 
               {general.showSidebar && 'navigation' !== general.type && (

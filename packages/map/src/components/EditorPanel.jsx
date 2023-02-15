@@ -100,6 +100,8 @@ const EditorPanel = props => {
     })
   }
 
+  console.log("MAP state, state.tooltips.appearanceType", state, state.tooltips.appearanceType)
+  
   const handleFilterOrder = (idx1, idx2, filterIndex, filter) => {
     let filterOrder = filter.values
     let [movedItem] = filterOrder.splice(idx1, 1)
@@ -433,6 +435,7 @@ const EditorPanel = props => {
                 appearanceType: 'hover'
               }
             })
+            ReactTooltip.rebuild()
             break
           case 'bubble':
             setState({
@@ -447,6 +450,7 @@ const EditorPanel = props => {
                 appearanceType: 'hover'
               }
             })
+            ReactTooltip.rebuild()
             break
           default:
             console.warn('Map type not set')
@@ -603,6 +607,7 @@ const EditorPanel = props => {
             appearanceType: value
           }
         })
+        ReactTooltip.rebuild()
         break
       case 'linkLabel':
         setState({
@@ -694,6 +699,7 @@ const EditorPanel = props => {
     // Navigate is required for navigation maps
     if ('navigation' === state.general.type && ('' === state.columns.navigate.name || undefined === state.columns.navigate)) {
       columnList.push('Navigation')
+      ReactTooltip.rebuild()
     }
 
     if ('us-geocode' === state.general.type && '' === state.columns.latitude.name) {
