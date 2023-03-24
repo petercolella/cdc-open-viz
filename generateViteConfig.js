@@ -47,7 +47,13 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: path.resolve(__dirname, 'testing-setup.js')
+      setupFiles: path.resolve(__dirname, 'testing-setup.js'),
+      deps: {
+        inline: ['whatwg-fetch']
+      }
+    },
+    resolve: {
+      mainFields: 'module'
     },
     ...configOptions
   }
