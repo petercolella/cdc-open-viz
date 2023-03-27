@@ -43,6 +43,7 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import cleanData from '@cdc/core/helpers/cleanData'
 
 import './scss/main.scss'
+import CoveGraph from './components/Graph'
 
 export default function CdcChart({ configUrl, config: configObj, isEditor = false, isDashboard = false, setConfig: setParentConfig, setEditing, hostname, link }) {
   const transform = new DataTransform()
@@ -724,7 +725,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     'Box Plot': <LinearChart />,
     'Area Chart': <LinearChart />,
     'Scatter Plot': <LinearChart />,
-    'Deviation Bar': <LinearChart />
+    'Deviation Bar': <LinearChart />,
+    Graph: <CoveGraph />
   }
 
   const missingRequiredSections = () => {
