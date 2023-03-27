@@ -1,8 +1,7 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext from '../ConfigContext'
 import { DefaultNode, Graph } from '@visx/network'
-import ParentSize from '@visx/responsive/lib/components/ParentSizeModern'
 
 export default function CoveGraph() {
   const { data, config, dimensions } = useContext(ConfigContext)
@@ -19,8 +18,6 @@ export default function CoveGraph() {
       // handle other types of targets as needed
     }
   }
-
-  console.log('graph', graph)
 
   // copy current pattern for height & width in linear chart.
   const [width] = dimensions
