@@ -2707,7 +2707,7 @@ const EditorPanel = () => {
                             <label>
                               <span className='edit-showDropdown column-heading'>Show Filter Input</span>
                               <input
-                                type="checkbox"
+                                type='checkbox'
                                 checked={filter.showDropdown === undefined ? true : filter.showDropdown}
                                 onChange={e => {
                                   updateFilterProp('showDropdown', index, e.target.checked)
