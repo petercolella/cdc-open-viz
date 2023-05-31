@@ -367,6 +367,44 @@ const SeriesDropdownConfidenceInterval = props => {
   )
 }
 
+const SeriesInputName = props => {
+  const { series, index: i } = props
+  const { config, updateConfig } = useContext(ConfigContext)
+  const adjustableNameSeriesTypes = ['Bar', 'Line']
+
+  if (config.visualizationType === 'Combo') return
+
+  if (!adjustableNameSeriesTypes.includes(series.type)) return
+
+  let changeSeriesName = (i, value) => {
+    let series = [...config.series]
+    let seriesLabelsCopy = { ...config.runtime.seriesLabels }
+    series[i].name = value
+    seriesLabelsCopy[series[i].dataKey] = series[i].name
+
+    let newConfig = {
+      ...config,
+      series
+    }
+
+    updateConfig(newConfig)
+  }
+
+  return (
+    <>
+      <label htmlFor='series-name'>Series Name</label>
+      <input
+        type='text'
+        key={`series-name-${i}`}
+        value={series.name ? series.name : ''}
+        onChange={event => {
+          changeSeriesName(i, event.target.value)
+        }}
+      />
+    </>
+  )
+}
+
 const SeriesButtonRemove = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const { series, index } = props
@@ -437,11 +475,11 @@ const SeriesItem = props => {
               </AccordionItemHeading>
               {chartsWithOptions.includes(config.visualizationType) && (
                 <AccordionItemPanel>
+                  <Series.Input.Name series={series} index={i} />
                   <Series.Dropdown.SeriesType series={series} index={i} />
                   <Series.Dropdown.AxisPosition series={series} index={i} />
                   <Series.Dropdown.LineType series={series} index={i} />
                   <Series.Dropdown.ForecastingStage series={series} index={i} />
-                  {/* <Series.Dropdown.ForecastingColumn series={series} index={i} /> */}
                   <Series.Dropdown.ForecastingColor series={series} index={i} />
                   <Series.Dropdown.ConfidenceInterval series={series} index={i} />
                 </AccordionItemPanel>
@@ -471,6 +509,9 @@ const Series = {
     ForecastingStage: SeriesDropdownForecastingStage,
     ForecastingColumn: SeriesDropdownForecastingColumn,
     ForecastingColor: SeriesDropdownForecastColor
+  },
+  Input: {
+    Name: SeriesInputName
   },
   Button: {
     Remove: SeriesButtonRemove

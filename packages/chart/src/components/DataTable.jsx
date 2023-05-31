@@ -95,10 +95,10 @@ export default function DataTable() {
               Header: '',
               Cell: ({ row }) => {
                 const getSeriesLabel = () => {
-                  if (config.runtimeSeriesLabels) return config.runtime.seriesLabels[row.original]
+                  if (config.runtime.seriesLabels) return config.runtime.seriesLabels[row.original]
                   return row.original
                 }
-                let pallete = colorPalettesChart[config.forecastingChart.colors[row.index]]
+
                 return (
                   <>
                     {config.visualizationType !== 'Pie' && (
@@ -107,8 +107,6 @@ export default function DataTable() {
                           // non-dynamic leged
                           !config.legend.dynamicLegend && config.visualizationType !== 'Forecasting'
                             ? colorScale(getSeriesLabel())
-                            : config.visualizationType === 'Forecasting'
-                            ? pallete[2]
                             : config.legend.dynamicLegend
                             ? colorPalettes[config.palette][row.index]
                             : // fallback

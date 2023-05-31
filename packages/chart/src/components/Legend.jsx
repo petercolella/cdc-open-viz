@@ -128,13 +128,13 @@ const Legend = () => {
     }
 
     // get forecasting items inside of combo
-    if (config.runtime.forecastingSeriesKeys.length > 0) {
+    if (config.runtime?.forecastingSeriesKeys?.length > 0) {
       let seriesLabels = []
 
       //store uniq values to Set by colorCode
 
       // loop through each stage/group/area on the chart and create a label
-      config.runtime.forecastingSeriesKeys.map((outerGroup, index) => {
+      config.runtime?.forecastingSeriesKeys?.map((outerGroup, index) => {
         return outerGroup?.stages?.map((stage, index) => {
           let paletteHere = colorPalettes[stage.color]
 
@@ -185,37 +185,43 @@ const Legend = () => {
         {legend.label && <h2>{parse(legend.label)}</h2>}
         {legend.description && <p>{parse(legend.description)}</p>}
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
-          {labels => (
-            <div className={innerClasses.join(' ')}>
-              {createLegendLabels(labels).map((label, i) => {
-                let legendClasses = ['legend-item']
-                let itemName = label.datum
+          {labels => {
+            console.log('labels', labels)
+            return (
+              <div className={innerClasses.join(' ')}>
+                {createLegendLabels(labels).map((label, i) => {
+                  let className = 'legend-item'
+                  let itemName = label.datum
 
                   // Filter excluded data keys from legend
                   if (config.exclusions.active && config.exclusions.keys?.includes(itemName)) {
                     return null
                   }
 
-                if (config.runtime.seriesLabels) {
-                  let index = config.runtime.seriesLabelsAll.indexOf(itemName)
-                  itemName = config.runtime.seriesKeys[index]
+                  if (config.runtime.seriesLabels) {
+                    let index = config.runtime.seriesLabelsAll.indexOf(itemName)
+                    itemName = config.runtime.seriesKeys[index]
 
-                  if (config.runtime.forecastingSeriesKeys.length > 0) {
-                    itemName = label.text
+                    if (config.runtime?.forecastingSeriesKeys?.length > 0) {
+                      itemName = label.text
+                    }
                   }
-                }
 
-                if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
-                  legendClasses.push('inactive')
-                }
+                  if (seriesHighlight.length > 0 && false === seriesHighlight.includes(itemName)) {
+                    className += ' inactive'
+                  }
 
-                return (
-                  <LegendItem
-                    className={legendClasses.join(' ')}
-                    tabIndex={0}
-                    key={`legend-quantile-${i}`}
-                    onKeyPress={e => {
-                      if (e.key === 'Enter') {
+                  return (
+                    <LegendItem
+                      className={className}
+                      tabIndex={0}
+                      key={`legend-quantile-${i}`}
+                      onKeyPress={e => {
+                        if (e.key === 'Enter') {
+                          highlight(label)
+                        }
+                      }}
+                      onClick={() => {
                         highlight(label)
                       }}
                     >
