@@ -136,13 +136,13 @@ const Legend = () => {
       // loop through each stage/group/area on the chart and create a label
       config.runtime?.forecastingSeriesKeys?.map((outerGroup, index) => {
         return outerGroup?.stages?.map((stage, index) => {
-          let paletteHere = colorPalettes[stage.color]
+          let colorValue = colorPalettes[stage.color]?.[2] ? colorPalettes[stage.color]?.[2] : '#ccc'
 
           const newLabel = {
             datum: stage.key,
             index: index,
             text: stage.key,
-            value: paletteHere[2]
+            value: colorValue
           }
 
           seriesLabels.push(newLabel)
@@ -150,18 +150,19 @@ const Legend = () => {
       })
 
       // loop through bars for now to meet requirements.
-      const barLabels = config.runtime.barSeriesKeys.map((bar, index) => {
-        let palette = colorPalettes[config.palette]
+      config.runtime.barSeriesKeys &&
+        config.runtime.barSeriesKeys.map((bar, index) => {
+          let colorValue = colorPalettes[config.palette][index] ? colorPalettes[config.palette][index] : '#ccc'
 
-        const newLabel = {
-          datum: bar,
-          index: index,
-          text: bar,
-          value: palette[index]
-        }
+          const newLabel = {
+            datum: bar,
+            index: index,
+            text: bar,
+            value: colorValue
+          }
 
-        seriesLabels.push(newLabel)
-      })
+          seriesLabels.push(newLabel)
+        })
 
       return seriesLabels
     }
@@ -186,7 +187,6 @@ const Legend = () => {
         {legend.description && <p>{parse(legend.description)}</p>}
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => {
-            console.log('labels', labels)
             return (
               <div className={innerClasses.join(' ')}>
                 {createLegendLabels(labels).map((label, i) => {
