@@ -31,7 +31,7 @@
     "gridLines": false,
     "enablePadding": false,
     "min": "0",
-    "max": "900",
+    "max": "100",
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
@@ -88,12 +88,7 @@
     "horizontal": 750
   },
   "xAxis": {
-    "anchors": [
-      {
-        "value": "10/19/2022",
-        "lineStyle": "dashed-md"
-      }
-    ],
+    "anchors": [],
     "type": "date",
     "showTargetLabel": true,
     "targetLabel": "Target",
@@ -178,29 +173,40 @@
   "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "type",
+      "dataKey": "quarter",
       "type": "Forecasting",
       "stages": [
         {
-          "key": "estimate",
-          "color": "sequential-blue-2-(MPX)reverse"
+          "key": "quarter one",
+          "color": "sequential-greenreverse"
         },
         {
-          "key": "estimate based on partial data",
+          "key": "quarter two",
+          "color": "sequential-greenreverse"
+        },
+        {
+          "key": "quarter three",
           "color": "sequential-orange-(MPX)reverse"
         },
         {
-          "key": "forecast",
-          "color": "sequential-greenreverse"
+          "key": "quarter four",
+          "color": "sequential-blue"
         }
       ],
-      "stageColumn": "type",
+      "stageColumn": "quarter",
       "confidenceIntervals": [
         {
           "high": "upper_90",
-          "low": "lower_90"
+          "low": "lower_90",
+          "showInTooltip": true
         }
-      ]
+      ],
+      "axis": "Left"
+    },
+    {
+      "dataKey": "random_col",
+      "type": "Bar",
+      "axis": "Left"
     }
   ],
   "forecastingChart": {
@@ -234,7 +240,7 @@
     ],
     "showBarColumn": true
   },
-  "dataUrl": "./examples/feature/forecasting/case_date_example.csv",
+  "dataUrl": "./examples/feature/forecasting/random_data.csv",
   "animateReplay": true,
-  "visualizationType": "Forecasting"
+  "visualizationType": "Combo"
 }

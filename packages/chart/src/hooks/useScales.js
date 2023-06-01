@@ -35,15 +35,6 @@ const useScales = properties => {
   if (!isHorizontal) {
     xScale = composeScalePoint(xAxisDataMapped, [0, xMax], 0.5)
     xScale.type = scaleTypes.POINT
-
-    // if (config.visualizationType === 'Bar') {
-    //   xScale = scaleBand({
-    //     domain: xAxisDataMapped,
-    //     range: [0, xMax],
-    //     padding: 0.4
-    //   })
-    //   xScale.type = scaleTypes.BAND
-    // }
     yScale = composeYScale(properties)
     seriesScale = composeScalePoint(seriesDomain, [0, xMax])
   }
@@ -82,6 +73,16 @@ const useScales = properties => {
       })
       xScale.type = scaleTypes.LINEAR
     }
+  }
+
+  // handle forecasting
+  if (config.visualizationType === 'Forecasting') {
+    // Set Scales
+    yScale = scaleLinear({
+      range: [yMax, 0],
+      round: true,
+      domain: [min, max]
+    })
   }
 
   // handle Box plot
