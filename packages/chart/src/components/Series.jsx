@@ -12,6 +12,14 @@ import { Accordion, AccordionItem, AccordionItemHeading, AccordionItemPanel, Acc
 import { Draggable } from '@hello-pangea/dnd'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
+const approvedCurveTypes = {
+  Linear: 'curveLinear',
+  Cardinal: 'curveCardinal',
+  Natural: 'curveNatural',
+  'Monotone X': 'curveMonotoneX',
+  Step: 'curveStep'
+}
+
 const SeriesContext = React.createContext()
 
 const SeriesWrapper = props => {
@@ -44,14 +52,6 @@ const SeriesDropdownLineType = props => {
     let series = [...config.series]
     series[i].lineType = value
     updateConfig({ ...config, series })
-  }
-
-  const approvedCurveTypes = {
-    Linear: 'curveLinear',
-    Cardinal: 'curveCardinal',
-    Natural: 'curveNatural',
-    'Monotone X': 'curveMonotoneX',
-    Step: 'curveStep'
   }
 
   let options = []
@@ -112,6 +112,30 @@ const SeriesDropdownSeriesType = props => {
         updateSeries(index, event.target.value, 'type')
       }}
       options={getOptions()}
+    />
+  )
+}
+
+const SeriesForecastingLineType = props => {
+  const { config, updateConfig } = useContext(ConfigContext)
+  const { series, index } = props
+
+  if (series.type !== 'Forecasting') return
+
+  return (
+    <InputSelect
+      value={series.forecastingLineType ? series.forecastingLineType : 'Linear'}
+      label='Forecasting Line Type'
+      onChange={e => {
+        const copyOfSeries = [...config.series] // copy the entire series array
+        copyOfSeries[index] = { ...copyOfSeries[index], forecastingLineType: e.target.value }
+
+        updateConfig({
+          ...config,
+          series: copyOfSeries
+        })
+      }}
+      options={Object.values(approvedCurveTypes)}
     />
   )
 }
@@ -474,7 +498,8 @@ const SeriesItem = props => {
                   <Series.Dropdown.SeriesType series={series} index={i} />
                   <Series.Dropdown.AxisPosition series={series} index={i} />
                   <Series.Dropdown.LineType series={series} index={i} />
-                  <Series.Dropdown.ForecastingStage series={series} index={i} />
+                  <Series.Dropdown.ForecastingLineType series={series} index={i} />
+                  {/* <Series.Dropdown.ForecastingStage series={series} index={i} /> */}
                   <Series.Dropdown.ForecastingColor series={series} index={i} />
                   <Series.Dropdown.ConfidenceInterval series={series} index={i} />
                 </AccordionItemPanel>
@@ -503,7 +528,8 @@ const Series = {
     LineType: SeriesDropdownLineType,
     ForecastingStage: SeriesDropdownForecastingStage,
     ForecastingColumn: SeriesDropdownForecastingColumn,
-    ForecastingColor: SeriesDropdownForecastColor
+    ForecastingColor: SeriesDropdownForecastColor,
+    ForecastingLineType: SeriesForecastingLineType
   },
   Input: {
     Name: SeriesInputName

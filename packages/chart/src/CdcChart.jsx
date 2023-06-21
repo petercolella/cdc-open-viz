@@ -521,6 +521,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
           newConfig.runtime.areaSeriesKeys.push(series)
         }
         if (series.type === 'Forecasting') {
+          series.stageColumn = series.dataKey
           newConfig.runtime.forecastingSeriesKeys.push(series)
         }
         if (series.type === 'Bar') {

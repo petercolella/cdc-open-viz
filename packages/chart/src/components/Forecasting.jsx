@@ -7,7 +7,7 @@ import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
 
 // visx & d3
 import { useTooltipInPortal, defaultStyles } from '@visx/tooltip'
-import { curveMonotoneX } from '@visx/curve'
+import * as allCurves from '@visx/curve'
 import { Bar, Area, LinePath, Line } from '@visx/shape'
 import { Group } from '@visx/group'
 
@@ -58,7 +58,7 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMou
                       <Group key={`forecasting-areas--stage-${stage.key.replaceAll(' ', '-')}--group-${stageIndex}-${ciGroupIndex}`}>
                         {/* prettier-ignore */}
                         <Area
-                          curve={curveMonotoneX}
+                          curve={allCurves[group.forecastingLineType]}
                           data={groupData}
                           fill={displayArea ? palette[ciGroupIndex] : 'transparent'}
                           opacity={transparentArea ? 0.1 : 0.5}
@@ -74,7 +74,7 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMou
                               data={groupData}
                               x={ d => xScale(Date.parse(d[xAxis.dataKey])) }
                               y={ d => yScale(d[ciGroup.high])}
-                              curve={curveMonotoneX}
+                              curve={allCurves[group.forecastingLineType]}
                               stroke={displayArea ? palette[2] : 'transparent'}
                               strokeWidth={1}
                               strokeOpacity={1}
@@ -85,7 +85,7 @@ const Forecasting = ({ xScale, yScale, height, width, chartRef, handleTooltipMou
                               data={groupData}
                               x={ d => xScale(Date.parse(d[xAxis.dataKey])) }
                               y={ d => yScale(d[ciGroup.low])}
-                              curve={curveMonotoneX}
+                              curve={allCurves[group.forecastingLineType]}
                               stroke={displayArea ? palette[2] : 'transparent'}
                               strokeWidth={1}
                               strokeOpacity={1}
