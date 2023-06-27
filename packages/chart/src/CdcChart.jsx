@@ -96,6 +96,24 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   let legendMemo = useRef(new Map()) // map collection
   let innerContainerRef = useRef()
 
+  // prettier-ignore
+  // easily change names if needed in the future.
+  const SERIES_NAMES = {
+    AREA: 'Area Chart',
+    BAR: 'Bar',
+    BOX_PLOT: 'Box Plot',
+    COMBO: 'Combo',
+    DEVIATION_BAR: 'Deviation Bar',
+    FORECAST: 'Forecast Chart',
+    LINE: 'Line',
+    PAIRED_BAR: 'Paired Bar',
+    PIE: 'Pie',
+    SCATTER_PLOT: 'Scatter Plot',
+    SPARK_LINE: 'Spark Line'
+  }
+
+  const { FORECAST } = SERIES_NAMES
+
   if (isDebug) console.log('Chart config', config)
 
   const DataTable = config?.table?.showVertical ? DataTable_vert : DataTable_horiz
@@ -533,7 +551,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
         if (series.type === 'Area Chart') {
           newConfig.runtime.areaSeriesKeys.push(series)
         }
-        if (series.type === 'Forecasting') {
+        if (series.type === FORECAST) {
           newConfig.runtime.forecastingSeriesKeys.push(series)
         }
         if (series.type === 'Bar') {
@@ -545,11 +563,11 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
       })
     }
 
-    if (newConfig.visualizationType === 'Forecasting' && newConfig.series) {
+    if (newConfig.visualizationType === FORECAST && newConfig.series) {
       newConfig.runtime.forecastingSeriesKeys = []
 
       newConfig.series.forEach(series => {
-        if (series.type === 'Forecasting') {
+        if (series.type === FORECAST) {
           newConfig.runtime.forecastingSeriesKeys.push(series)
         }
       })
@@ -770,7 +788,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     const newSeriesHighlight = []
 
     // If we're highlighting all the series, reset them
-    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend && config.visualizationType !== 'Forecasting') {
+    if (seriesHighlight.length + 1 === config.runtime.seriesKeys.length && !config.legend.dynamicLegend && config.visualizationType !== FORECAST) {
       highlightReset()
       return
     }
@@ -972,7 +990,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   // Select appropriate chart type
   const chartComponents = {
     'Paired Bar': <LinearChart />,
-    Forecasting: <LinearChart />,
+    [FORECAST]: <LinearChart />,
     Bar: <LinearChart />,
     Line: <LinearChart />,
     Combo: <LinearChart />,
@@ -984,7 +1002,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
   }
 
   const missingRequiredSections = () => {
-    if (config.visualizationType === 'Forecasting') return false // skip required checks for now.
+    if (config.visualizationType === FORECAST) return false // skip required checks for now.
     if (config.visualizationType === 'Pie') {
       if (undefined === config?.yAxis.dataKey) {
         return true
@@ -1102,7 +1120,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
 
   const clean = data => {
     // cleaning is deleting data we need in forecasting charts.
-    if (config.visualizationType === 'Forecasting') return data
+    if (config.visualizationType === FORECAST) return data
     return config?.xAxis?.dataKey ? transform.cleanData(data, config.xAxis.dataKey) : data
   }
 
@@ -1259,7 +1277,8 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     isDebug,
     setSharedFilter,
     setSharedFilterValue,
-    dashboardConfig
+    dashboardConfig,
+    SERIES_NAMES
   }
 
   const classes = ['cdc-open-viz-module', 'type-chart', `${currentViewport}`, `font-${config.fontSize}`, `${config.theme}`]

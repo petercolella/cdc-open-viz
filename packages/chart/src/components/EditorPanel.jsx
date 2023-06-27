@@ -208,11 +208,13 @@ const Regions = memo(({ config, updateConfig }) => {
 const headerColors = ['theme-blue', 'theme-purple', 'theme-brown', 'theme-teal', 'theme-pink', 'theme-orange', 'theme-slate', 'theme-indigo', 'theme-cyan', 'theme-green', 'theme-amber']
 
 const EditorPanel = () => {
-  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, lineOptions, rawData } = useContext(ConfigContext)
+  const { config, updateConfig, transformedData: data, loading, colorPalettes, twoColorPalette, unfilteredData, excludedData, isDashboard, setParentConfig, missingRequiredSections, isDebug, setFilteredData, lineOptions, rawData, SERIES_NAMES } = useContext(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
 
   const { twoColorPalettes, sequential, nonSequential } = useColorPalette(config, updateConfig)
+
+  const { FORECAST, BAR, LINE, COMBO, AREA, SCATTER_PLOT, BOX_PLOT, DEVIATION_BAR, SPARK_LINE, PAIRED_BAR, PIE } = SERIES_NAMES
 
   // argument acts as props
   const { handleFilterOrder, filterOrderOptions, filterStyleOptions } = useFilters({ config, setConfig: updateConfig, filteredData: data, setFilteredData })
@@ -671,8 +673,8 @@ const EditorPanel = () => {
   }, [config]) // eslint-disable-line
 
   const visSupportsTooltipLines = () => {
-    if (config.visualizationType === 'Combo' && config.runtime.forecastingSeriesKeys?.length > 0) return true
-    if (config.visualizationType === 'Forecasting') return true
+    if (config.visualizationType === COMBO && config.runtime.forecastingSeriesKeys?.length > 0) return true
+    if (config.visualizationType === FORECAST) return true
     return false
   }
 
@@ -826,17 +828,17 @@ const EditorPanel = () => {
 
   // prettier-ignore
   const enabledChartTypes = [
-    'Area Chart',
-    'Bar',
-    'Box Plot',
-    'Combo',
-    'Deviation Bar',
-    // 'Forecasting',
-    'Line',
-    'Paired Bar',
-    'Pie',
-    'Scatter Plot',
-    'Spark Line'
+    AREA,
+    BAR,
+    BOX_PLOT,
+    COMBO,
+    DEVIATION_BAR,
+    FORECAST,
+    LINE,
+    PAIRED_BAR,
+    PIE,
+    SCATTER_PLOT,
+    SPARK_LINE
   ]
 
   const isLoadedFromUrl = config?.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
@@ -872,7 +874,7 @@ const EditorPanel = () => {
     if (isDebug) console.log('### COVE DEBUG: Chart: Setting default datacol=', setdatacol) // eslint-disable-line
   }
 
-  const chartsWithOptions = ['Area Chart', 'Combo', 'Line', 'Bar', 'Forecasting']
+  const chartsWithOptions = [AREA, COMBO, LINE, BAR, FORECAST]
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>

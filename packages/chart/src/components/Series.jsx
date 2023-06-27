@@ -74,9 +74,10 @@ const SeriesDropdownLineType = props => {
 }
 
 const SeriesDropdownSeriesType = props => {
-  const { config } = useContext(ConfigContext)
+  const { config, SERIES_NAMES } = useContext(ConfigContext)
   const { updateSeries } = useContext(SeriesContext)
 
+  const { FORECAST } = SERIES_NAMES
   const { index, series } = props
 
   const getOptions = () => {
@@ -88,7 +89,7 @@ const SeriesDropdownSeriesType = props => {
         'dashed-md': 'Medium Dashed',
         'dashed-lg': 'Large Dashed',
         'Area Chart': 'Area Chart',
-        Forecasting: 'Forecasting'
+        [FORECAST]: [FORECAST]
       }
     }
     if (config.visualizationType === 'Line') {
@@ -117,13 +118,14 @@ const SeriesDropdownSeriesType = props => {
 }
 
 const SeriesDropdownForecastingStage = props => {
-  const { config, updateConfig, rawData } = useContext(ConfigContext)
-  const { updateSeries, getColumns } = useContext(SeriesContext)
+  const { config, updateConfig, rawData, SERIES_NAMES } = useContext(ConfigContext)
+  const { getColumns } = useContext(SeriesContext)
+  const { FORECAST } = SERIES_NAMES
 
   const { index, series } = props
 
   // Only combo charts are allowed to have different options
-  if (series.type !== 'Forecasting') return
+  if (series.type !== 'Forecast Chart') return
 
   return (
     <InputSelect
@@ -153,13 +155,14 @@ const SeriesDropdownForecastingStage = props => {
 }
 
 const SeriesDropdownForecastingColumn = props => {
-  const { config, rawData } = useContext(ConfigContext)
+  const { config, rawData, SERIES_NAMES } = useContext(ConfigContext)
   const { updateSeries } = useContext(SeriesContext)
+  const { FORECAST } = SERIES_NAMES
 
   const { index, series } = props
 
   // Only combo charts are allowed to have different options
-  if (series.type !== 'Forecasting') return
+  if (series.type !== FORECAST) return
   if (!rawData) return
   if (!series.stageColumn) return
 
@@ -209,11 +212,11 @@ const SeriesDropdownAxisPosition = props => {
 }
 
 const SeriesDropdownForecastColor = props => {
-  const { config, updateConfig } = useContext(ConfigContext)
+  const { config, updateConfig, SERIES_NAMES } = useContext(ConfigContext)
+  const { FORECAST } = SERIES_NAMES
 
   const { index, series } = props
-
-  if (series.type !== 'Forecasting') return
+  if (series.type !== FORECAST) return
 
   // Hide AxisPositionDropdown in certain cases.
   if (!series) return
@@ -241,10 +244,14 @@ const SeriesDropdownForecastColor = props => {
 }
 
 const SeriesDropdownConfidenceInterval = props => {
-  const { config, updateConfig } = useContext(ConfigContext)
+  const {
+    config,
+    updateConfig,
+    SERIES_NAMES: { FORECAST }
+  } = useContext(ConfigContext)
   const { series, index } = props
   const { getColumns } = useContext(SeriesContext)
-  if (series.type !== 'Forecasting') return
+  if (series.type !== FORECAST) return
 
   return (
     <div className='edit-block'>

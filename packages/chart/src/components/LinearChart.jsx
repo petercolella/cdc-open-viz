@@ -28,7 +28,9 @@ import useTopAxis from '../hooks/useTopAxis'
 import Forecasting from './Forecasting'
 
 export default function LinearChart() {
-  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData } = useContext(ConfigContext)
+  const { transformedData: data, dimensions, config, parseDate, formatDate, currentViewport, formatNumber, handleChartAriaLabels, updateConfig, handleLineType, rawData, SERIES_NAMES } = useContext(ConfigContext)
+
+  const { FORECAST } = SERIES_NAMES
 
   // getters & functions
   const getXAxisData = d => (config.runtime.xAxis.type === 'date' ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime() : d[config.runtime.originalXAxis.dataKey])
@@ -170,7 +172,7 @@ export default function LinearChart() {
     // loop through series for items to add to tooltip.
     // there is probably a better way of doing this.
     config.series?.map(s => {
-      if (s.type === 'Forecasting') {
+      if (s.type === FORECAST) {
         stageColumns.push(s.stageColumn)
 
         // greedy fn 😭
@@ -541,7 +543,7 @@ export default function LinearChart() {
         {(config.visualizationType === 'Area Chart' || config.visualizationType === 'Combo') && <CoveAreaChart xScale={xScale} yScale={yScale} yMax={yMax} xMax={xMax} chartRef={svgRef} />}
         {(config.visualizationType === 'Bar' || config.visualizationType === 'Combo') && <BarChart xScale={xScale} yScale={yScale} seriesScale={seriesScale} xMax={xMax} yMax={yMax} getXAxisData={getXAxisData} getYAxisData={getYAxisData} animatedChart={animatedChart} visible={animatedChart} />}
         {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />}
-        {(config.visualizationType === 'Forecasting' || config.visualizationType === 'Combo') && (
+        {(config.visualizationType === FORECAST || config.visualizationType === 'Combo') && (
           <Forecasting
             hideTooltip={hideTooltip}
             showTooltip={showTooltip}
@@ -572,7 +574,7 @@ export default function LinearChart() {
           config.visualizationType !== 'Area Chart' &&
           config.visualizationType !== 'Scatter Plot' &&
           config.visualizationType !== 'Deviation Bar' &&
-          config.visualizationType !== 'Forecasting' && (
+          config.visualizationType !== FORECAST && (
             <>
               <LineChart xScale={xScale} yScale={yScale} getXAxisData={getXAxisData} getYAxisData={getYAxisData} xMax={xMax} yMax={yMax} seriesStyle={config.series} />
             </>
