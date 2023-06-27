@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect, memo, useContext } from 'react'
 
 import { jsx } from '@emotion/react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -10,10 +10,11 @@ import { AlbersUsa, Mercator } from '@visx/geo'
 import chroma from 'chroma-js'
 import CityList from './CityList'
 import BubbleList from './BubbleList'
-import { supportedCities, supportedStates } from '../data/supported-geos'
+import { supportedCities } from '../data/supported-geos'
 import { geoAlbersUsa } from 'd3-composite-projections'
 
 import useMapLayers from '../hooks/useMapLayers'
+import ConfigContext from '../context'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
@@ -72,7 +73,7 @@ const nudges = {
 }
 
 const UsaMap = props => {
-  const { state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, supportedTerritories, titleCase, handleCircleClick, setSharedFilterValue, handleMapAriaLabels } = props
+  const { supportedStates, supportedTerritories, state, applyTooltipsToGeo, data, geoClickHandler, applyLegendToRow, displayGeoName, titleCase, handleCircleClick, setSharedFilterValue, handleMapAriaLabels } = useContext(ConfigContext)
 
   let isFilterValueSupported = false
 
@@ -236,13 +237,13 @@ const UsaMap = props => {
 
     // Order alphabetically. Important for accessibility if ever read out loud.
     geographies.map(state => {
-      if (!state.feature.properties.iso) return
+      if (!supportedStates[state.feature.properties.iso]) return
       state.feature.properties.name = titleCase(supportedStates[state.feature.properties.iso][0])
     })
 
     geographies.sort((a, b) => {
-      const first = a.feature.properties.name.toUpperCase() // ignore upper and lowercase
-      const second = b.feature.properties.name.toUpperCase() // ignore upper and lowercase
+      const first = a.feature.properties.name?.toUpperCase() // ignore upper and lowercase
+      const second = b.feature.properties.name?.toUpperCase() // ignore upper and lowercase
       if (first < second) {
         return -1
       }

@@ -1,0 +1,51 @@
+FIPS Code,ISO,State Name,Abbreviation
+1,US-AL,Alabama,AL
+2,US-AK,Alaska,AK
+4,US-AZ,Arizona,AZ
+5,US-AR,Arkansas,AR
+6,US-CA,California,CA
+8,US-CO,Colorado,CO
+9,US-CT,Connecticut,CT
+10,US-DE,Delaware,DE
+12,US-FL,Florida,FL
+13,US-GA,Georgia,GA
+15,US-HI,Hawaii,HI
+16,US-ID,Idaho,ID
+17,US-IL,Illinois,IL
+18,US-IN,Indiana,IN
+19,US-IA,Iowa,IA
+20,US-KS,Kansas,KS
+21,US-KY,Kentucky,KY
+22,US-LA,Louisiana,LA
+23,US-ME,Maine,ME
+24,US-MD,Maryland,MD
+25,US-MA,Massachusetts,MA
+26,US-MI,Michigan,MI
+27,US-MN,Minnesota,MN
+28,US-MS,Mississippi,MS
+29,US-MO,Missouri,MO
+30,US-MT,Montana,MT
+31,US-NE,Nebraska,NE
+32,US-NV,Nevada,NV
+33,US-NH,New Hampshire,NH
+34,US-NJ,New Jersey,NJ
+35,US-NM,New Mexico,NM
+36,US-NY,New York,NY
+37,US-NC,North Carolina,NC
+38,US-ND,North Dakota,ND
+39,US-OH,Ohio,OH
+40,US-OK,Oklahoma,OK
+41,US-OR,Oregon,OR
+42,US-PA,Pennsylvania,PA
+44,US-RI,Rhode Island,RI
+45,US-SC,South Carolina,SC
+46,US-SD,South Dakota,SD
+47,US-TN,Tennessee,TN
+48,US-TX,Texas,TX
+49,US-UT,Utah,UT
+50,US-VT,Vermont,VT
+51,US-VA,Virginia,VA
+53,US-WA,Washington,WA
+54,US-WV,West Virginia,WV
+55,US-WI,Wisconsin,WI
+56,US-WY,Wyoming,WY

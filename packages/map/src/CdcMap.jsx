@@ -9,6 +9,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import chroma from 'chroma-js'
 import Papa from 'papaparse'
+import supportedStatesCsv from './data/supported-states.csv'
 import parse from 'html-react-parser'
 import 'react-tooltip/dist/react-tooltip.css'
 
@@ -18,7 +19,7 @@ import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 
 // Data
 import { countryCoordinates } from './data/country-coordinates'
-import { supportedStates, supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
+import { supportedTerritories, supportedCountries, supportedCounties, supportedCities, supportedStatesFipsCodes, stateFipsToTwoDigit, supportedRegions } from './data/supported-geos'
 import colorPalettes from '../../core/data/colorPalettes'
 import initialState from './data/initial-state'
 
@@ -53,7 +54,6 @@ import UsaRegionMap from './components/UsaRegionMap' // Future: Lazy
 import WorldMap from './components/WorldMap' // Future: Lazy
 
 // Data props
-const stateKeys = Object.keys(supportedStates)
 const territoryKeys = Object.keys(supportedTerritories)
 const regionKeys = Object.keys(supportedRegions)
 const countryKeys = Object.keys(supportedCountries)
@@ -230,7 +230,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
         }
 
         // States
-        uid = stateKeys.find(key => supportedStates[key].includes(geoName))
+        uid = Object.keys(supportedStates).find(key => supportedStates[key].includes(geoName))
 
         // Territories
         if (!uid) {
@@ -1137,7 +1137,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
   const displayGeoName = key => {
     let value = key
     // Map to first item in values array which is the preferred label
-    if (stateKeys.includes(value)) {
+    if (Object.keys(supportedStates).includes(value)) {
       value = titleCase(supportedStates[key][0])
     }
 
@@ -1333,6 +1333,11 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
       setState({ ...state, runtimeDataUrl: dataUrlFinal, data })
     }
   }
+
+  const supportedStates = {}
+  supportedStatesCsv.forEach(entry => {
+    supportedStates[entry.ISO] = [entry['State Name'], entry['Abbreviation']]
+  })
 
   const loadConfig = async configObj => {
     // Set loading flag
@@ -1581,8 +1586,12 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
     setRuntimeFilters,
     innerContainerRef,
     currentViewport,
-    isDebug
+    isDebug,
+    supportedStates,
+    supportedTerritories
   }
+
+  const locations = {}
 
   if (!mapProps.data || !state.data) return <Loading />
 
@@ -1675,7 +1684,7 @@ const CdcMap = ({ className, config, navigationHandler: customNavigationHandler,
                   <section className='geography-container' ref={mapSvg}>
                     {modal && <Modal type={general.type} viewport={currentViewport} applyTooltipsToGeo={applyTooltipsToGeo} applyLegendToRow={applyLegendToRow} capitalize={state.tooltips.capitalizeLabels} content={modal} />}
                     {'single-state' === general.geoType && <SingleStateMap supportedTerritories={supportedTerritories} {...mapProps} />}
-                    {'us' === general.geoType && 'us-geocode' !== state.general.type && <UsaMap supportedTerritories={supportedTerritories} {...mapProps} />}
+                    {'us' === general.geoType && 'us-geocode' !== state.general.type && <UsaMap />}
                     {'us-region' === general.geoType && <UsaRegionMap supportedTerritories={supportedTerritories} {...mapProps} />}
                     {'world' === general.geoType && <WorldMap supportedCountries={supportedCountries} {...mapProps} />}
                     {'us-county' === general.geoType && <CountyMap supportedCountries={supportedCountries} {...mapProps} />}
