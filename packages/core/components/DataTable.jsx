@@ -13,18 +13,9 @@ import { formatNumber } from '@cdc/core/helpers/cove/number'
 
 import Loading from '@cdc/core/components/Loading'
 
-// FILE REVIEW
-// TODO: Remove eslint-disable jsx/a11y/non-interactive-tabindex and handle appropriately
-//  - I am not finding jsx/a11y/non-interactive-tabindex... did you fix already?
-// TODO: Move ExternalIcon to core Icon component - Looks like you already moved it???
-// TODO: use destructuring - WHERE?
-// TODO: @tturnerswdev33 - It looks like there's an unused variable setFilteredCountryCode that was added - no it is used in line 268
-// TODO: @tturnerswdev33 - change function declarations to arrow functions - DONE not sure why I did that but brings up question as to why arrow functions are better?  Or just code consistency?
-// TODO: @tturnerswdev33 - move caption so that useMemo is not rendered conditionally - MOVE it where?  I can just remove the useMemo
-
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
-  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, isDebug } = props
+  const { config, tableTitle, indexTitle, vizTitle, rawData, runtimeData, headerColor, expandDataTable, columns, displayDataAsText, applyLegendToRow, displayGeoName, navigationHandler, viewport, formatLegendLocation, tabbingId, isDebug, isEditor } = props
 
   /* eslint-disable no-console */
   if (isDebug) {
@@ -37,7 +28,16 @@ const DataTable = props => {
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
-  const [sortBy, setSortBy] = useState({ column: config.type === 'map' ? 'geo' : 'date', asc: false })
+  //debugger
+  /*   let initSortBy = ''
+  if (config.type === 'map') {
+    initSortBy = 'geo'
+  } else if (config.type === 'chart') {
+    initSortBy = config.xAxis.dataKey
+  } else {
+    initSortBy = '' // not sure where this comes from
+  } */
+  const [sortBy, setSortBy] = useState({ column: config.type === 'map' ? 'geo' : config.xAxis.dataKey, asc: false }) //
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
@@ -214,8 +214,15 @@ const DataTable = props => {
 
   const rows = Object.keys(runtimeData).sort((a, b) => {
     let sortVal
-    if (config.columns) {
-      sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
+    console.log('sortBy=', sortBy, a, b, config.columns)
+    //debugger
+    //if ((!isEditor && config.columns) || (isEditor && config.columns.length > 0)) {
+    //let colObjValid = Object.keys(config.columns).length
+    //if (Object.keys(config.columns).length > 0) {
+    if (runtimeData[a][sortBy.column] !== undefined && runtimeData[b][sortBy.column] !== undefined) {
+      //sortVal = customSort(runtimeData[a][config.columns[sortBy.column].name], runtimeData[b][config.columns[sortBy.column].name])
+      sortVal = customSort(runtimeData[a][sortBy.column], runtimeData[b][sortBy.column])
+      console.log('sorting by sortVal=', sortVal)
     }
     if (!sortBy.asc) return sortVal
     if (sortVal === 0) return 0

@@ -1266,6 +1266,7 @@ export default function CdcChart({ configUrl, config: configObj, isEditor = fals
     getTextWidth,
     twoColorPalette,
     isDebug,
+    isEditor,
     setSharedFilter,
     setSharedFilterValue,
     dashboardConfig
