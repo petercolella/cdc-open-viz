@@ -260,7 +260,7 @@ const DataTable = props => {
               }
 
               return (
-                <td tabIndex='0' role='gridcell' onClick={e => (config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}>
+                <td tabIndex='0' role='gridcell' key={`tbody__tr__td-${column}-${row}`} onClick={e => (config.general.type === 'bubble' && config.general.allowMapZoom && config.general.geoType === 'world' ? setFilteredCountryCode(row) : true)}>
                   {cellValue}
                 </td>
               )
@@ -353,11 +353,9 @@ const DataTable = props => {
 
   // if its additional column, return formatting params
   const isAdditionalColumn = column => {
-    let inthere = false
     let formattingParams = {}
     Object.keys(config.columns).forEach(keycol => {
       if (config.columns[keycol].name === column) {
-        inthere = true
         formattingParams = {
           addColPrefix: config.columns[keycol].prefix,
           addColSuffix: config.columns[keycol].suffix,
@@ -402,7 +400,7 @@ const DataTable = props => {
             }
 
             return (
-              <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`}>
+              <td tabIndex='0' role='gridcell' id={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`} key={`${runtimeData[config.runtime.originalXAxis.dataKey]}--${row}`}>
                 {cellValue}
               </td>
             )
