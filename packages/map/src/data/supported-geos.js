@@ -52,7 +52,15 @@ export const supportedStates = {
   'US-WA': ['WASHINGTON', 'WA'],
   'US-WV': ['WEST VIRGINIA', 'WV'],
   'US-WI': ['WISCONSIN', 'WI'],
-  'US-WY': ['WYOMING', 'WY']
+  'US-WY': ['WYOMING', 'WY'],
+  'US-AS': ['AMERICAN SAMOA', 'AS'],
+  'US-FM': ['FEDERATED STATES OF MICRONESIA', 'FM'],
+  'US-GU': ['GUAM', 'GU'],
+  'US-MH': ['MARSHALL ISLANDS', 'MH'],
+  'US-MP': ['NORTHERN MARIANAS', 'MP'],
+  'US-PW': ['PALAU', 'PW'],
+  'US-PR': ['PUERTO RICO', 'PR'],
+  'US-VI': ['U.S. VIRGIN ISLANDS', 'VI']
 }
 
 export const supportedRegions = {
