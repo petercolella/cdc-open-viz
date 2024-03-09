@@ -5,15 +5,16 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 // United States Topojson resources
 import topoJSON from '../data/us-topo.json'
 import hexTopoJSON from '../data/us-hex-topo.json'
+import topoJSON_us_state from '../data/cb_2022_us_state_500k.json'
 
-import { geoCentroid, geoPath } from 'd3-geo'
+import { geoCentroid, geoPath, geoMercator } from 'd3-geo'
 import { feature } from 'topojson-client'
-import { AlbersUsa, Mercator } from '@visx/geo'
+import { AlbersUsa, Mercator, CustomProjection } from '@visx/geo'
 import chroma from 'chroma-js'
 import CityList from '../../CityList'
 import BubbleList from '../../BubbleList'
 import { supportedCities, supportedStates } from '../../../data/supported-geos'
-import { geoAlbersUsa } from 'd3-composite-projections'
+import { geoAlbersUsa, geoAlbersUsaTerritories } from 'd3-composite-projections'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
@@ -27,6 +28,85 @@ import { MapContext } from '../../../types/MapContext'
 
 const { features: unitedStates } = feature(topoJSON, topoJSON.objects.states)
 const { features: unitedStatesHex } = feature(hexTopoJSON, hexTopoJSON.objects.states)
+
+const { geometries: usStateGeometries } = topoJSON_us_state.objects.cb_2022_us_state_500k
+const territoryArray = [
+  {
+    features: [],
+    fips: '60',
+    iso: 'US-AS',
+    position: {
+      hex: {
+        scaleFactor: 4.25,
+        xTranslateFactor: 0,
+        yTranslateFactor: 1
+      },
+      scaleFactor: 2.5,
+      xTranslateFactor: 0,
+      yTranslateFactor: 1
+    }
+  },
+  {
+    features: [],
+    fips: '66',
+    iso: 'US-GU',
+    position: {
+      hex: {
+        scaleFactor: 4.25,
+        xTranslateFactor: 0,
+        yTranslateFactor: 0.65
+      },
+      scaleFactor: 6,
+      xTranslateFactor: 0,
+      yTranslateFactor: 0.8
+    }
+  },
+  {
+    features: [],
+    fips: '69',
+    iso: 'US-MP',
+    position: {
+      hex: {
+        scaleFactor: 4.25,
+        xTranslateFactor: 0,
+        yTranslateFactor: 0.5
+      },
+      scaleFactor: 2,
+      xTranslateFactor: 0,
+      yTranslateFactor: 0.4
+    }
+  },
+  {
+    features: [],
+    fips: '72',
+    iso: 'US-PR',
+    position: {
+      hex: {
+        scaleFactor: 4.25,
+        xTranslateFactor: 0.6,
+        yTranslateFactor: 1
+      },
+      scaleFactor: 3,
+      xTranslateFactor: 0.6,
+      yTranslateFactor: 1
+    }
+  },
+  {
+    features: [],
+    fips: '78',
+    iso: 'US-VI',
+    position: {
+      hex: {
+        scaleFactor: 4.25,
+        xTranslateFactor: 0.75,
+        yTranslateFactor: 1
+      },
+      scaleFactor: 7,
+      xTranslateFactor: 0.75,
+      yTranslateFactor: 1
+    }
+  }
+]
 
 const offsets = {
   'US-VT': [50, -8],
@@ -88,9 +168,23 @@ const UsaMap = () => {
     })
   }
 
+  territoryArray.forEach(t => {
+    const { features } = feature(topoJSON_us_state, {
+      type: 'GeometryCollection',
+      geometries: usStateGeometries
+        .filter(d => d.properties.STATEFP === t.fips)
+        .map(d => {
+          return { ...d, properties: { iso: t.iso, name: supportedTerritories[t.iso][1] } }
+        })
+    })
+
+    t.features = features
+  })
+
   // "Choose State" options
   const [extent, setExtent] = useState(null)
   const [focusedStates, setFocusedStates] = useState(unitedStates)
+  const [territoryValues, setTerritoryValues] = useState(territoryArray)
   const [translate, setTranslate] = useState([455, 200])
 
   // When returning from another map we want to reset the state
@@ -119,6 +213,7 @@ const UsaMap = () => {
   const geoStrokeColor = state.general.geoBorderColor === 'darkGray' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255,255,255,0.7)'
 
   const territories = territoriesData.map(territory => {
+    if (territoryValues.map(d => d.iso).includes(territory)) return
     const Shape = isHex ? Territory.Hexagon : Territory.Rectangle
 
     const territoryData = data[territory]
@@ -181,7 +276,7 @@ const UsaMap = () => {
   const { pathArray } = useMapLayers(state, '', pathGenerator)
 
   // Constructs and displays markup for all geos on the map (except territories right now)
-  const constructGeoJsx = (geographies, projection) => {
+  const constructGeoJsx = (geographies, projection, rectPath) => {
     let showLabel = state.general.displayStateLabels
 
     // Order alphabetically. Important for accessibility if ever read out loud.
@@ -230,6 +325,9 @@ const UsaMap = () => {
       }
 
       const geoDisplayName = displayGeoName(geoKey)
+
+      const isTerr = territoryValues.map(d => d.iso).includes(geo.properties.iso)
+      const [[left, top], [right, bottom]] = rectPath ? rectPath.bounds(geo) : [[], []]
 
       // If a legend applies, return it with appropriate information.
       if (legendColors && legendColors[0] !== '#000000') {
@@ -296,6 +394,7 @@ const UsaMap = () => {
           <g data-name={geoName} key={key}>
             <g className='geo-group' style={styles} onClick={() => geoClickHandler(geoDisplayName, geoData)} id={geoName} data-tooltip-id='tooltip' data-tooltip-html={tooltip}>
               <path tabIndex={-1} className='single-geo' strokeWidth={1.3} d={path} />
+              {!isHex && <rect width={right - left} height={bottom - top} x={left} y={top} fill='transparent' stroke={isTerr ? 'red' : 'none'} strokeWidth={2} />}
               {state.map.patterns.map((patternData, patternIndex) => {
                 let { pattern, dataKey, size } = patternData
                 let defaultPatternColor = 'black'
@@ -328,6 +427,7 @@ const UsaMap = () => {
       return (
         <g data-name={geoName} key={key}>
           <g className='geo-group' style={styles}>
+            {!isHex && <rect width={right - left} height={bottom - top} x={left} y={top} fill='transparent' stroke={isTerr ? 'red' : 'none'} strokeWidth={2} />}
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1.3} d={path} />
             {(isHex || showLabel) && geoLabel(geo, styles.fill, projection)}
           </g>
@@ -418,17 +518,104 @@ const UsaMap = () => {
     )
   }
 
+  const viewBox = [0, 0, 880, 550]
+  const [, , width, height] = viewBox
+
+  const getScaledValues = (bounds, scaleFactor, xTranslateFactor, yTranslateFactor) => {
+    const [[left, top], [right, bottom]] = bounds
+    const scaledHeight = (bottom - top) * scaleFactor
+    const scaledWidth = (right - left) * scaleFactor
+    const xTranslate = (width - scaledWidth) * xTranslateFactor
+    const yTranslate = (height - scaledHeight) * yTranslateFactor
+    return { scaledHeight, scaledWidth, xTranslate, yTranslate }
+  }
+
+  // Hex Territory Constants
+  const { geometries: hexGeometries } = hexTopoJSON.objects.states
+  const { features: hexFeatures } = feature(hexTopoJSON, {
+    type: 'GeometryCollection',
+    geometries: hexGeometries.slice(0, 1)
+  })
+  const hexPath = geoPath().projection(geoMercator())
+  const hexBounds = hexPath.bounds({
+    type: 'FeatureCollection',
+    features: hexFeatures
+  })
+
   return (
     <ErrorBoundary component='UsaMap'>
-      <svg viewBox='0 0 880 500' role='img' aria-label={handleMapAriaLabels(state)}>
+      <svg viewBox={viewBox.toString()} role='img' aria-label={handleMapAriaLabels(state)} style={{ border: 'solid 1px red' }}>
         {state.general.displayAsHex ? (
-          <Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
-            {({ features, projection }) => constructGeoJsx(features, projection)}
-          </Mercator>
+          <>
+            <Mercator data={unitedStatesHex} scale={650} translate={[1600, 775]}>
+              {({ features, projection }) => constructGeoJsx(features, projection)}
+            </Mercator>
+            {territoryValues.map(
+              ({
+                iso,
+                position: {
+                  hex: { scaleFactor, xTranslateFactor, yTranslateFactor }
+                }
+              }) => {
+                const features = hexFeatures.map(d => {
+                  return { ...d, properties: { iso, name: supportedTerritories[iso][1] } }
+                })
+                const { scaledHeight, scaledWidth, xTranslate, yTranslate } = getScaledValues(hexBounds, scaleFactor, xTranslateFactor, yTranslateFactor)
+
+                return (
+                  <CustomProjection
+                    data={features}
+                    projection={geoMercator}
+                    fitExtent={[
+                      [
+                        [xTranslate, yTranslate],
+                        [scaledWidth + xTranslate, scaledHeight + yTranslate]
+                      ],
+                      {
+                        type: 'FeatureCollection',
+                        features
+                      }
+                    ]}
+                  >
+                    {({ features, projection }) => constructGeoJsx(features, projection)}
+                  </CustomProjection>
+                )
+              }
+            )}
+          </>
         ) : (
-          <AlbersUsa data={focusedStates} translate={translate} fitExtent={extent}>
-            {({ features, projection }) => constructGeoJsx(features, projection)}
-          </AlbersUsa>
+          <>
+            <AlbersUsa data={focusedStates} translate={translate} fitExtent={extent}>
+              {({ features, projection, path }) => constructGeoJsx(features, projection, path)}
+            </AlbersUsa>
+            {territoryValues.map(({ features, position: { scaleFactor, xTranslateFactor, yTranslateFactor } }) => {
+              const path = geoPath().projection(geoAlbersUsaTerritories())
+              const bounds = path.bounds({
+                type: 'FeatureCollection',
+                features
+              })
+              const { scaledHeight, scaledWidth, xTranslate, yTranslate } = getScaledValues(bounds, scaleFactor, xTranslateFactor, yTranslateFactor)
+
+              return (
+                <CustomProjection
+                  data={features}
+                  projection={geoAlbersUsaTerritories}
+                  fitExtent={[
+                    [
+                      [xTranslate, yTranslate],
+                      [scaledWidth + xTranslate, scaledHeight + yTranslate]
+                    ],
+                    {
+                      type: 'FeatureCollection',
+                      features
+                    }
+                  ]}
+                >
+                  {({ features, projection, path }) => constructGeoJsx(features, projection, path)}
+                </CustomProjection>
+              )
+            })}
+          </>
         )}
       </svg>
 
